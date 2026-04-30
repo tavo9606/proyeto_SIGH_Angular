@@ -261,21 +261,36 @@
 
       <h2>✅ Verificar Pagos</h2>
 
-      <!--
-        [style.color]:
-        cambia dinámicamente el color del texto.
-
-        Si el estado es "pagada":
-        color verde.
-
-        Si no:
-        color naranja.
-      -->
-      <td
-        [style.color]="f.estado === 'pagada' ? 'green' : 'orange'"
-      >
-        {{ f.estado }}
-      </td>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Paciente ID</th>
+            <th>Descripción</th>
+            <th>Total</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let f of facturas">
+            <td>{{ f.id }}</td>
+            <td>{{ f.paciente_id }}</td>
+            <td>{{ f.descripcion || '—' }}</td>
+            <td>{{ f.total }}</td>
+            <!--
+              [style.color]:
+              cambia dinámicamente el color del texto.
+              Verde si está pagada, naranja si no.
+            -->
+            <td [style.color]="f.estado === 'pagada' ? 'green' : 'orange'">
+              {{ f.estado }}
+            </td>
+          </tr>
+          <tr *ngIf="facturas.length === 0">
+            <td colspan="5" style="text-align:center; color:#94a3b8">Sin facturas registradas</td>
+          </tr>
+        </tbody>
+      </table>
 
     </div>
 
