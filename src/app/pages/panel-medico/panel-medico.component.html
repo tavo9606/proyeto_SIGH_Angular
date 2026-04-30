@@ -1,0 +1,170 @@
+<!-- Navbar con subtítulo para identificar el panel -->
+<app-navbar subtitulo="Panel Médico - SGIH"></app-navbar>
+
+<!-- Layout de dos columnas: sidebar izquierdo + contenido principal -->
+<div class="layout">
+
+  <!-- Menú lateral: lista de secciones del panel -->
+  <aside class="sidebar">
+    <h3 class="menu-title">Panel Médico</h3>
+    <ul class="menu">
+      <!-- *ngFor recorre el arreglo menuItems y genera un <li> por cada sección -->
+      <!-- [class.active] añade la clase CSS 'active' si el ítem es el seleccionado -->
+      <!-- (click) cambia la sección activa al hacer clic -->
+      <li
+        *ngFor="let item of menuItems"
+        class="menu-item"
+        [class.active]="activo === item.id"
+        (click)="setActivo(item.id)"
+      >
+        {{ item.label }}
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Área principal: muestra el panel de la sección activa -->
+  <main>
+
+    <!-- ── 👤 SECCIÓN: REGISTRO Y CONSULTA DE PACIENTES ── -->
+    <!-- [class.active] muestra u oculta el panel según la sección seleccionada -->
+    <div class="panel" [class.active]="activo === 'registroPaciente'">
+      <h2>Registro de Pacientes</h2>
+
+      <!-- Formulario para registrar un nuevo paciente -->
+      <!-- (ngSubmit) llama a guardarPaciente() al hacer clic en el botón submit -->
+      <form (ngSubmit)="guardarPaciente()">
+        <input id="nombre"    placeholder="Nombre completo" [(ngModel)]="formPaciente.nombre"    name="nombre"    required />
+        <input id="documento" placeholder="Documento"       [(ngModel)]="formPaciente.documento" name="documento" required />
+        <input id="edad"      type="number" placeholder="Edad" [(ngModel)]="formPaciente.edad"   name="edad" />
+        <select id="sexo" [(ngModel)]="formPaciente.sexo" name="sexo">
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+        </select>
+        <input id="telefono"  placeholder="Teléfono"  [(ngModel)]="formPaciente.telefono"  name="telefono" />
+        <input id="direccion" placeholder="Dirección" [(ngModel)]="formPaciente.direccion" name="direccion" />
+        <button type="submit">Guardar Paciente</button>
+      </form>
+
+      <hr style="margin: 20px 0; border: 1px solid #f1f5f9" />
+      <h3>Consulta de Pacientes</h3>
+
+      <!-- Barra de búsqueda por nombre o documento -->
+      <div class="buscador">
+        <input
+          placeholder="Buscar por nombre o documento"
+          [(ngModel)]="busqueda"
+          style="flex: 1"
+        />
+        <button type="button" (click)="buscar()">Buscar</button>
+        <!-- "Ver Todos" recarga la lista completa sin filtro -->
+        <button type="button" class="btn-gray" (click)="cargarPacientes()">Ver Todos</button>
+      </div>
+
+      <!-- Tabla dinámica de pacientes -->
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th><th>Documento</th><th>Edad</th>
+            <th>Sexo</th><th>Teléfono</th><th>Dirección</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- *ngFor genera una fila por cada paciente en el arreglo -->
+          <tr *ngFor="let p of pacientes">
+            <td>{{ p.nombre }}</td>
+            <td>{{ p.documento }}</td>
+            <td>{{ p.edad || '—' }}</td>   <!-- || '—' muestra guion si no hay dato -->
+            <td>{{ p.sexo }}</td>
+            <td>{{ p.telefono || '—' }}</td>
+            <td>{{ p.direccion || '—' }}</td>
+            <td><button class="btn-delete" (click)="eliminarPaciente(p.id)">Eliminar</button></td>
+          </tr>
+          <!-- Mensaje cuando no hay resultados -->
+          <tr *ngIf="pacientes.length === 0">
+            <td colspan="7" style="text-align: center; color: #94a3b8">Sin resultados</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── 📄 SECCIÓN: HISTORIA CLÍNICA ── -->
+    <div class="panel" [class.active]="activo === 'historiaMedica'">
+      <h2>Historia Clínica</h2>
+      <form class="col1">
+        <input placeholder="Documento del paciente" />
+        <input placeholder="Motivo de consulta" />
+        <input placeholder="Signos vitales" />
+        <textarea placeholder="Descripción clínica"></textarea>
+        <textarea placeholder="Tratamiento"></textarea>
+        <button type="button">Guardar</button>
+      </form>
+    </div>
+
+    <!-- ── 💊 SECCIÓN: TRATAMIENTOS ── -->
+    <div class="panel" [class.active]="activo === 'tratamientos'">
+      <h2>Tratamientos</h2>
+      <form class="col1">
+        <input placeholder="Documento del paciente" />
+        <input placeholder="Medicamento" />
+        <input placeholder="Dosis" />
+        <textarea placeholder="Indicaciones"></textarea>
+        <button type="button">Registrar</button>
+      </form>
+    </div>
+
+    <!-- ── 🏥 SECCIÓN: HOSPITALIZACIÓN ── -->
+    <div class="panel" [class.active]="activo === 'hospitalizacion'">
+      <h2>Hospitalización</h2>
+      <form class="col1">
+        <input placeholder="Documento del paciente" />
+        <input placeholder="Número de cama" />
+        <input type="date" />
+        <select>
+          <option>General</option>
+          <option>UCI</option>
+          <option>Observación</option>
+        </select>
+        <button type="button">Registrar</button>
+      </form>
+    </div>
+
+    <!-- ── 🩺 SECCIÓN: MÉDICOS REGISTRADOS ── -->
+    <div class="panel" [class.active]="activo === 'medicos'">
+      <h2>Médicos Registrados</h2>
+      <button type="button" class="btn-gray" (click)="cargarMedicos()" style="margin-bottom: 16px">Actualizar</button>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th><th>Usuario</th><th>Cédula</th><th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of medicos">
+            <td>{{ m.nombres || '—' }}</td>
+            <td>{{ m.usuario }}</td>
+            <td>{{ m.cedula || '—' }}</td>
+            <td>{{ m.email || '—' }}</td>
+          </tr>
+          <tr *ngIf="medicos.length === 0">
+            <td colspan="4" style="text-align: center; color: #94a3b8">No hay médicos registrados</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── 📊 SECCIÓN: REPORTES ── -->
+    <div class="panel" [class.active]="activo === 'reportes'">
+      <h2>Reportes</h2>
+      <form class="col1">
+        <input placeholder="Documento del paciente" />
+        <select>
+          <option>Historia Clínica</option>
+          <option>Tratamientos</option>
+          <option>Hospitalización</option>
+        </select>
+        <button type="button">Generar</button>
+      </form>
+    </div>
+
+  </main>
+</div>

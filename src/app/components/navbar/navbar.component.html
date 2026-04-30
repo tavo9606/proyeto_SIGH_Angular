@@ -1,0 +1,35 @@
+<!-- Barra de navegación superior fija (sticky) -->
+<header class="navbar">
+
+  <!-- Sección izquierda: logo e identificación del hospital -->
+  <div class="navbar-brand">
+    <img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png" class="logo-hospital" alt="Logo" />
+    <div class="titulo">
+      <strong>Hospital Vida Sana</strong>
+      <!-- Muestra el subtítulo solo si fue enviado como @Input (ej: en PanelMedico) -->
+      <span *ngIf="subtitulo">{{ subtitulo }}</span>
+    </div>
+  </div>
+
+  <!-- Título central — se muestra solo si NO hay subtítulo -->
+  <span *ngIf="!subtitulo" class="navbar-title">{{ titulo }}</span>
+
+  <!-- Sección derecha: avatar del usuario y menú desplegable -->
+  <div class="user-menu">
+    <!-- Clic en el avatar abre/cierra el menú desplegable -->
+    <img
+      src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+      class="user-img"
+      alt="Usuario"
+      (click)="toggleMenu()"
+    />
+
+    <!-- Menú desplegable: visible solo cuando abierto === true -->
+    <div *ngIf="abierto" class="user-dropdown">
+      <p class="titulo-menu">{{ usuario }}</p>
+      <!-- Al hacer clic llama a cerrarSesion() que limpia localStorage y va al login -->
+      <button (click)="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </div>
+
+</header>

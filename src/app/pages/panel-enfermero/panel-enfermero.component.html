@@ -1,0 +1,106 @@
+<app-navbar titulo="Panel Enfermería - SGIH"></app-navbar>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h3>Enfermería</h3>
+    <ul>
+      <li
+        *ngFor="let item of menuItems"
+        [class.active]="activo === item.id"
+        (click)="setActivo(item.id)"
+      >
+        {{ item.label }}
+      </li>
+    </ul>
+  </aside>
+
+  <div id="content">
+    <!-- 💊 MEDICAMENTOS -->
+    <div class="panel" [class.active]="activo === 'medicamentos'">
+      <h2>💊 Medicamentos</h2>
+
+      <form (ngSubmit)="guardarMedicamento()">
+        <input placeholder="Nombre del medicamento" [(ngModel)]="formMedicamento.nombre"      name="nombre"      required />
+        <input placeholder="Descripción"            [(ngModel)]="formMedicamento.descripcion" name="descripcion" />
+        <input type="number" placeholder="Stock"    [(ngModel)]="formMedicamento.stock"       name="stock" />
+        <input placeholder="Unidad (ej: mg, ml)"   [(ngModel)]="formMedicamento.unidad"      name="unidad" />
+        <input type="number" placeholder="Precio"  [(ngModel)]="formMedicamento.precio"      name="precio" />
+        <button type="submit">Guardar</button>
+      </form>
+
+      <div class="buscador">
+        <input placeholder="Buscar medicamento" [(ngModel)]="busquedaMed" style="flex:1" />
+        <button type="button" (click)="buscarMedicamento()">Buscar</button>
+        <button type="button" class="btn-gray" (click)="cargarMedicamentos()">Ver Todos</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Nombre</th><th>Stock</th><th>Unidad</th><th>Precio</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of medicamentos">
+            <td>{{ m.nombre }}</td>
+            <td>{{ m.stock }}</td>
+            <td>{{ m.unidad || '—' }}</td>
+            <td>{{ m.precio ? '$ ' + m.precio : '—' }}</td>
+            <td><button class="btn-delete" (click)="eliminarMedicamento(m.id)">Eliminar</button></td>
+          </tr>
+          <tr *ngIf="medicamentos.length === 0">
+            <td colspan="5" style="text-align:center; color:#94a3b8">Sin medicamentos</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 🛏️ CAMAS -->
+    <div class="panel" [class.active]="activo === 'camas'">
+      <h2>🛏️ Gestión de Camas</h2>
+
+      <form (ngSubmit)="guardarCama()">
+        <input placeholder="Número de cama" [(ngModel)]="formCama.numero" name="numero" required />
+        <input placeholder="Piso"           [(ngModel)]="formCama.piso"   name="piso" />
+        <select [(ngModel)]="formCama.tipo" name="tipo">
+          <option value="General">General</option>
+          <option value="UCI">UCI</option>
+          <option value="Pediatría">Pediatría</option>
+          <option value="Maternidad">Maternidad</option>
+        </select>
+        <select [(ngModel)]="formCama.estado" name="estado">
+          <option value="disponible">Disponible</option>
+          <option value="ocupada">Ocupada</option>
+        </select>
+        <button type="submit">Agregar Cama</button>
+      </form>
+
+      <table>
+        <thead>
+          <tr><th>Número</th><th>Piso</th><th>Tipo</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of camas">
+            <td>{{ c.numero }}</td>
+            <td>{{ c.piso || '—' }}</td>
+            <td>{{ c.tipo }}</td>
+            <td [style.color]="c.estado === 'disponible' ? 'green' : 'red'">{{ c.estado }}</td>
+            <td><button class="btn-delete" (click)="eliminarCama(c.id)">Eliminar</button></td>
+          </tr>
+          <tr *ngIf="camas.length === 0">
+            <td colspan="5" style="text-align:center; color:#94a3b8">Sin camas registradas</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 📝 NOTAS -->
+    <div class="panel" [class.active]="activo === 'notas'">
+      <h2>📝 Notas de Enfermería</h2>
+      <form class="col1">
+        <input placeholder="Documento del paciente" />
+        <input placeholder="Turno (mañana/tarde/noche)" />
+        <textarea placeholder="Observaciones del turno..." style="min-height:120px"></textarea>
+        <button type="button">Guardar Nota</button>
+      </form>
+    </div>
+  </div>
+</div>

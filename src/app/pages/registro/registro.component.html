@@ -1,0 +1,78 @@
+<!-- Página de registro con fondo degradado -->
+<div class="registro-page">
+  <section class="form-registrer">
+    <h4>Formulario Registro</h4>
+
+    <!-- El formulario usa col1 para mostrar los campos en una sola columna -->
+    <form (ngSubmit)="handleSubmit()" class="col1" style="margin-bottom: 0">
+
+      <!-- Cada input usa [(ngModel)] para vincularse bidireccionalmente con el objeto 'form' -->
+      <input
+        class="controls" type="text" id="nombres"
+        placeholder="Nombres y apellidos"
+        [(ngModel)]="form.nombres" name="nombres"
+      />
+
+      <input
+        class="controls" type="text" id="cedula"
+        placeholder="Cédula"
+        [(ngModel)]="form.cedula" name="cedula"
+      />
+
+      <!-- El campo usuario es obligatorio (required) -->
+      <input
+        class="controls" type="text" id="usuario"
+        placeholder="Usuario" required
+        [(ngModel)]="form.usuario" name="usuario"
+      />
+
+      <input
+        class="controls" type="email" id="email"
+        placeholder="Correo electrónico"
+        [(ngModel)]="form.email" name="email"
+      />
+
+      <!-- Etiqueta personalizada para el campo de fecha -->
+      <label for="fecha_nacimiento" class="label-fecha">Fecha de nacimiento:</label>
+      <input
+        class="controls" type="date" id="fecha_nacimiento"
+        min="1900-01-01" max="2025-11-09"
+        [(ngModel)]="form.fecha_nacimiento" name="fecha_nacimiento"
+      />
+
+      <!-- Selector de rol: campo obligatorio -->
+      <select class="controls" id="rol" [(ngModel)]="form.rol" name="rol" required>
+        <option value="" disabled>-- Elija un rol --</option>
+        <option value="administrador">Administrador</option>
+        <option value="medico">Médico</option>
+        <option value="enfermero">Enfermero</option>
+        <option value="paciente">Paciente</option>
+      </select>
+
+      <input
+        class="controls" type="password" id="password"
+        placeholder="Contraseña" required
+        [(ngModel)]="form.password" name="password"
+      />
+
+      <!-- Mensaje de error condicional -->
+      <p *ngIf="error" style="color: red; font-size: 13px; text-align: center">{{ error }}</p>
+
+      <p>Estoy de acuerdo con <a href="#">Términos y Condiciones</a></p>
+
+      <!-- [value] cambia el texto del botón según el estado de cargando -->
+      <!-- [disabled] bloquea el botón mientras se procesa la petición -->
+      <input
+        class="botons" type="submit"
+        [value]="cargando ? 'Registrando...' : 'Registrar'"
+        [disabled]="cargando"
+      />
+
+      <!-- Enlace para volver al login si ya tiene cuenta -->
+      <p>
+        <a href="#" (click)="$event.preventDefault(); irLogin()">¿Ya tengo cuenta?</a>
+      </p>
+
+    </form>
+  </section>
+</div>
