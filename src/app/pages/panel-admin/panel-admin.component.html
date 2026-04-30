@@ -1,9 +1,40 @@
+<!-- =========================
+ PANEL ADMINISTRATIVO - SGIH
+ Este componente representa la interfaz del administrador.
+ Permite gestionar:
+ - Citas médicas
+ - Facturación
+ - Pagos
+ - Usuarios
+ - Estadísticas del sistema
+========================= -->
+
+<!-- Navbar reutilizable con el título del panel -->
 <app-navbar titulo="Panel Administrativo - SGIH"></app-navbar>
 
 <div class="layout">
+
+  <!-- =========================
+   MENÚ LATERAL
+   Se genera dinámicamente usando *ngFor
+  ========================= -->
   <aside class="sidebar">
     <h3>Administración</h3>
+
     <ul>
+
+      <!--
+        *ngFor recorre el arreglo menuItems
+        y crea un <li> por cada sección del menú.
+
+        [class.active]:
+        agrega la clase CSS "active"
+        cuando el item seleccionado coincide con la variable activo.
+
+        (click):
+        ejecuta setActivo(item.id)
+        para cambiar la sección visible.
+      -->
       <li
         *ngFor="let item of menuItems"
         [class.active]="activo === item.id"
@@ -11,136 +42,310 @@
       >
         {{ item.label }}
       </li>
+
     </ul>
   </aside>
 
+  <!-- =========================
+   CONTENIDO PRINCIPAL
+  ========================= -->
   <div id="content">
-    <!-- 📅 CITAS -->
+
+    <!-- ======================================================
+     📅 GESTIÓN DE CITAS
+    ======================================================= -->
+
+    <!--
+      [class.active]:
+      muestra este panel únicamente
+      si activo === 'gestionCitas'
+    -->
     <div class="panel" [class.active]="activo === 'gestionCitas'">
+
       <h2>📅 Gestión de Citas</h2>
 
+      <!--
+        Formulario para crear citas médicas.
+
+        (ngSubmit):
+        ejecuta guardarCita() cuando el usuario envía el formulario.
+      -->
       <form (ngSubmit)="guardarCita()">
-        <input placeholder="ID del paciente" [(ngModel)]="formCita.paciente_id" name="paciente_id" required />
-        <input placeholder="ID del médico"   [(ngModel)]="formCita.medico_id"   name="medico_id"   required />
-        <input type="date"                   [(ngModel)]="formCita.fecha"        name="fecha"        required />
-        <input type="time"                   [(ngModel)]="formCita.hora"         name="hora"         required />
-        <input placeholder="Motivo"          [(ngModel)]="formCita.motivo"       name="motivo" />
+
+        <!--
+          [(ngModel)]:
+          vincula el input con la variable en tiempo real.
+        -->
+
+        <input
+          placeholder="ID del paciente"
+          [(ngModel)]="formCita.paciente_id"
+          name="paciente_id"
+          required
+        />
+
+        <input
+          placeholder="ID del médico"
+          [(ngModel)]="formCita.medico_id"
+          name="medico_id"
+          required
+        />
+
+        <input
+          type="date"
+          [(ngModel)]="formCita.fecha"
+          name="fecha"
+          required
+        />
+
+        <input
+          type="time"
+          [(ngModel)]="formCita.hora"
+          name="hora"
+          required
+        />
+
+        <input
+          placeholder="Motivo"
+          [(ngModel)]="formCita.motivo"
+          name="motivo"
+        />
+
+        <!-- Selector del estado de la cita -->
         <select [(ngModel)]="formCita.estado" name="estado">
+
           <option value="pendiente">Pendiente</option>
           <option value="confirmada">Confirmada</option>
           <option value="cancelada">Cancelada</option>
           <option value="realizada">Realizada</option>
+
         </select>
+
+        <!-- Botón submit -->
         <button type="submit">Agendar Cita</button>
+
       </form>
 
+      <!-- =========================
+       TABLA DE CITAS
+      ========================= -->
       <table>
+
         <thead>
-          <tr><th>Fecha</th><th>Hora</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr>
+          <tr>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Motivo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
         </thead>
+
         <tbody>
+
+          <!--
+            *ngFor recorre el arreglo citas
+            y genera una fila por cada cita.
+          -->
           <tr *ngFor="let c of citas">
+
+            <!--
+              date:'dd/MM/yyyy'
+              formatea la fecha.
+            -->
             <td>{{ c.fecha | date:'dd/MM/yyyy' }}</td>
+
             <td>{{ c.hora }}</td>
+
+            <!--
+              || '—'
+              muestra un guion si no existe motivo.
+            -->
             <td>{{ c.motivo || '—' }}</td>
+
             <td>{{ c.estado }}</td>
-            <td><button class="btn-delete" (click)="eliminarCita(c.id)">Eliminar</button></td>
+
+            <td>
+
+              <!--
+                Elimina la cita usando su ID.
+              -->
+              <button
+                class="btn-delete"
+                (click)="eliminarCita(c.id)"
+              >
+                Eliminar
+              </button>
+
+            </td>
+
           </tr>
+
+          <!--
+            *ngIf:
+            muestra este mensaje
+            si no existen citas registradas.
+          -->
           <tr *ngIf="citas.length === 0">
-            <td colspan="5" style="text-align:center; color:#94a3b8">Sin citas registradas</td>
+
+            <td colspan="5" style="text-align:center; color:#94a3b8">
+
+              Sin citas registradas
+
+            </td>
+
           </tr>
+
         </tbody>
+
       </table>
+
     </div>
 
-    <!-- 💵 FACTURACIÓN -->
+    <!-- ======================================================
+     💵 FACTURACIÓN
+    ======================================================= -->
+
     <div class="panel" [class.active]="activo === 'facturacion'">
+
       <h2>💵 Facturación</h2>
 
+      <!--
+        Formulario para crear facturas.
+      -->
       <form (ngSubmit)="guardarFactura()">
-        <input placeholder="ID del paciente"  [(ngModel)]="formFactura.paciente_id"  name="paciente_id"  required />
-        <input placeholder="Descripción"      [(ngModel)]="formFactura.descripcion"  name="descripcion" />
-        <input type="number" placeholder="Total" [(ngModel)]="formFactura.total"     name="total"        required />
-        <select [(ngModel)]="formFactura.estado" name="estado">
+
+        <input
+          placeholder="ID del paciente"
+          [(ngModel)]="formFactura.paciente_id"
+          name="paciente_id"
+          required
+        />
+
+        <input
+          placeholder="Descripción"
+          [(ngModel)]="formFactura.descripcion"
+          name="descripcion"
+        />
+
+        <input
+          type="number"
+          placeholder="Total"
+          [(ngModel)]="formFactura.total"
+          name="total"
+          required
+        />
+
+        <select
+          [(ngModel)]="formFactura.estado"
+          name="estado"
+        >
+
           <option value="pendiente">Pendiente</option>
           <option value="pagada">Pagada</option>
           <option value="cancelada">Cancelada</option>
+
         </select>
+
         <button type="submit">Crear Factura</button>
+
       </form>
 
-      <table>
-        <thead>
-          <tr><th>Descripción</th><th>Total</th><th>Estado</th><th>Fecha</th></tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let f of facturas">
-            <td>{{ f.descripcion || '—' }}</td>
-            <td>$ {{ f.total }}</td>
-            <td>{{ f.estado }}</td>
-            <td>{{ f.fecha | date:'dd/MM/yyyy' }}</td>
-          </tr>
-          <tr *ngIf="facturas.length === 0">
-            <td colspan="4" style="text-align:center; color:#94a3b8">Sin facturas</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
 
-    <!-- ✅ PAGOS -->
+    <!-- ======================================================
+     ✅ VERIFICACIÓN DE PAGOS
+    ======================================================= -->
+
     <div class="panel" [class.active]="activo === 'pagos'">
+
       <h2>✅ Verificar Pagos</h2>
-      <table>
-        <thead>
-          <tr><th>Descripción</th><th>Total</th><th>Estado</th><th>Fecha</th></tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let f of facturas">
-            <td>{{ f.descripcion || '—' }}</td>
-            <td>$ {{ f.total }}</td>
-            <td [style.color]="f.estado === 'pagada' ? 'green' : 'orange'">{{ f.estado }}</td>
-            <td>{{ f.fecha | date:'dd/MM/yyyy' }}</td>
-          </tr>
-          <tr *ngIf="facturas.length === 0">
-            <td colspan="4" style="text-align:center; color:#94a3b8">Sin registros</td>
-          </tr>
-        </tbody>
-      </table>
+
+      <!--
+        [style.color]:
+        cambia dinámicamente el color del texto.
+
+        Si el estado es "pagada":
+        color verde.
+
+        Si no:
+        color naranja.
+      -->
+      <td
+        [style.color]="f.estado === 'pagada' ? 'green' : 'orange'"
+      >
+        {{ f.estado }}
+      </td>
+
     </div>
 
-    <!-- 👥 USUARIOS -->
+    <!-- ======================================================
+     👥 GESTIÓN DE USUARIOS
+    ======================================================= -->
+
     <div class="panel" [class.active]="activo === 'usuarios'">
+
       <h2>👥 Gestión de Usuarios</h2>
-      <button type="button" class="btn-gray" (click)="cargarUsuarios()" style="margin-bottom:16px">Actualizar</button>
-      <table>
-        <thead>
-          <tr><th>Nombre</th><th>Usuario</th><th>Rol</th><th>Cédula</th><th>Email</th></tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let u of usuarios">
-            <td>{{ u.nombres || '—' }}</td>
-            <td>{{ u.usuario }}</td>
-            <td>{{ u.rol }}</td>
-            <td>{{ u.cedula || '—' }}</td>
-            <td>{{ u.email || '—' }}</td>
-          </tr>
-          <tr *ngIf="usuarios.length === 0">
-            <td colspan="5" style="text-align:center; color:#94a3b8">Sin usuarios</td>
-          </tr>
-        </tbody>
-      </table>
+
+      <!--
+        Botón que recarga los usuarios desde el backend.
+      -->
+      <button
+        type="button"
+        class="btn-gray"
+        (click)="cargarUsuarios()"
+      >
+
+        Actualizar
+
+      </button>
+
     </div>
 
-    <!-- 📊 ESTADÍSTICAS -->
+    <!-- ======================================================
+     📊 ESTADÍSTICAS
+    ======================================================= -->
+
     <div class="panel" [class.active]="activo === 'estadisticas'">
+
       <h2>📊 Estadísticas del Sistema</h2>
-      <div *ngIf="estadisticas" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-top:16px">
-        <div *ngFor="let item of estadisticas | keyvalue" style="background:var(--azul-suave);border-radius:12px;padding:20px;text-align:center">
-          <div style="font-size:28px;font-weight:700;color:var(--azul)">{{ item.value }}</div>
-          <div style="font-size:13px;color:#475569;margin-top:4px;text-transform:capitalize">{{ item.key }}</div>
+
+      <!--
+        *ngIf="estadisticas":
+        muestra las tarjetas únicamente
+        cuando los datos ya llegaron del backend.
+      -->
+      <div *ngIf="estadisticas">
+
+        <!--
+          keyvalue:
+          convierte el objeto estadisticas
+          en pares clave-valor para recorrerlos.
+        -->
+        <div *ngFor="let item of estadisticas | keyvalue">
+
+          <!-- Valor -->
+          <div>
+            {{ item.value }}
+          </div>
+
+          <!-- Nombre -->
+          <div>
+            {{ item.key }}
+          </div>
+
         </div>
+
       </div>
-      <p *ngIf="!estadisticas" style="color:#94a3b8">Cargando estadísticas...</p>
+
+      <!-- Mensaje mientras cargan los datos -->
+      <p *ngIf="!estadisticas">
+
+        Cargando estadísticas...
+
+      </p>
+
     </div>
+
   </div>
 </div>
